@@ -224,12 +224,27 @@
                                 :columns="columns"
                                 :fetchFunction="fetchProducts"
                                 :extraParams="filters"
+                                :reloadKey="reloadKey"
                             >
                                 <template #row="{ row }">
                                     <td>{{ row.name }}</td>
                                     <td>{{ row?.category?.name }}</td>
                                     <td>{{ row.price }}</td>
                                     <td>{{ row.stock }}</td>
+                                    <td>
+                                        <button
+                                            class="btn btn-sm btn-primary me-2"
+                                            @click="editProduct(row.id)"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-danger"
+                                            @click="deleteProduct(row.id)"
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
                                 </template>
                             </DataTable>
                         </div>
@@ -247,7 +262,7 @@
                     <button
                         type="button"
                         class="btn btn-sm btn-icon btn-active-color-primary"
-                        @click="closeModalCustomer"
+                        @click="closeModalProduct"
                     >
                         ✕
                     </button>
@@ -255,11 +270,9 @@
                 <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
                     <div class="mb-13 text-center">
                         <h1 class="mb-3">
-                            <!-- {{
-                                customerData.id
-                                    ? "Edit Customer"
-                                    : "Add Customer"
-                            }} -->
+                            {{
+                                productData.id ? "Edit Product" : "Add Product"
+                            }}
                         </h1>
                     </div>
                     <div class="d-flex flex-column mb-8 fv-row">
@@ -267,6 +280,7 @@
                             <span class="required">Name</span>
                         </label>
                         <input
+                            v-model="productData.name"
                             type="text"
                             class="form-control form-control-solid"
                             placeholder="Enter Name"
@@ -277,6 +291,7 @@
                             <span class="required">Price</span>
                         </label>
                         <input
+                            v-model="productData.price"
                             type="number"
                             class="form-control form-control-solid"
                             placeholder="Enter Name"
@@ -287,6 +302,7 @@
                             <span class="required">Stock</span>
                         </label>
                         <input
+                            v-model="productData.stock"
                             type="number"
                             class="form-control form-control-solid"
                             placeholder="Enter Name"
@@ -296,8 +312,18 @@
                         <label class="fs-6 fw-semibold mb-2">
                             <span class="required">Category</span>
                         </label>
-                        <select class="form-select form-select-solid">
+                        <select
+                            v-model="productData.categoryId"
+                            class="form-select form-select-solid"
+                        >
                             <option value="">-- Select Category --</option>
+                            <option
+                                v-for="cat in categoryList"
+                                :key="cat.id"
+                                :value="cat.id"
+                            >
+                                {{ cat.name }}
+                            </option>
                         </select>
                     </div>
                     <div class="text-center">
@@ -311,7 +337,7 @@
                         <button
                             type="button"
                             class="btn btn-primary"
-                            @click="submitCustomer"
+                            @click="submitProduct"
                         >
                             Submit
                         </button>
@@ -331,15 +357,20 @@ import { showModal, hideModal } from "@/helpers/modal";
 import { swalApiResponse, swalConfirm } from "@/utils/swal";
 import { showLoading, hideLoading } from "@/utils/loading";
 import { Product } from "@/interfaces/product";
+import { Category } from "@/interfaces/category";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 
 const authStore = useAuthStore();
-
 const search = ref("");
+const reloadKey = ref(0);
+
 const columns = [
-    { key: "name", label: "Name", sortable: true, width: "200px" },
-    { key: "category_id", label: "Category", sortable: true, width: "200px" },
-    { key: "price", label: "Price", sortable: true, width: "200px" },
-    { key: "stock", label: "Stock", sortable: true, width: "200px" },
+    { key: "id", label: "No", sortable: true },
+    { key: "name", label: "Name", sortable: true },
+    { key: "category_id", label: "Category", sortable: true },
+    { key: "price", label: "Price", sortable: true },
+    { key: "stock", label: "Stock", sortable: true },
+    { key: "action", label: "Action", sortable: false },
 ];
 const filters = computed(() => ({
     search: search.value,
@@ -364,10 +395,165 @@ const productData = reactive<Product>({
 });
 
 const openModalProduct = () => {
+    // showLoading();
+    // const res = await fetchCategory();
+    // if (res.data) {
+    //     categoryList.value = res.data.data;
+    //     hideLoading();
+    // }
     showModal("modal_product");
 };
 
 const closeModalProduct = () => {
     hideModal("modal_product");
+};
+
+const storeProductMutation = useMutation({
+    mutationFn: async () => {
+        const { data } = await customApi.post("/api-web/master/product", {
+            name: productData.name,
+            categoryId: productData.categoryId,
+            price: productData.price,
+            stock: productData.stock,
+        });
+        return data;
+    },
+    onMutate: () => {
+        showLoading();
+    },
+    onSuccess: (res) => {
+        swalApiResponse(res, {
+            successMessage: "Success Add Product",
+        });
+        closeModalProduct();
+        reloadKey.value++;
+    },
+    onError: (err) => {
+        swalApiResponse(err);
+    },
+    onSettled: () => {
+        hideLoading();
+    },
+});
+
+const updateProductMutation = useMutation({
+    mutationFn: async () => {
+        const { data } = await customApi.post(
+            `/api-web/master/product/${productData.id}/update`,
+            {
+                name: productData.name,
+                categoryId: productData.categoryId,
+                price: productData.price,
+                stock: productData.stock,
+            },
+        );
+        return data;
+    },
+    onMutate: () => {
+        showLoading();
+    },
+    onSuccess: (res) => {
+        swalApiResponse(res, {
+            successMessage: "Success Update Product",
+        });
+        closeModalProduct();
+        reloadKey.value++;
+    },
+    onError: (err) => {
+        swalApiResponse(err);
+    },
+    onSettled: () => {
+        hideLoading();
+    },
+});
+
+const deleteProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+        const { data } = await customApi.delete(
+            `/api-web/master/product/${id}`,
+        );
+        return data;
+    },
+    onMutate: () => {
+        showLoading();
+    },
+    onSuccess: (res) => {
+        swalApiResponse(res, {
+            successMessage: "Success Delete Customer",
+        });
+        closeModalProduct?.();
+        reloadKey.value++;
+    },
+    onError: (err) => {
+        swalApiResponse(err);
+    },
+    onSettled: () => {
+        hideLoading();
+    },
+});
+
+const showProductMutation = useMutation({
+    mutationFn: async (id: string) => {
+        const { data } = await customApi.get(`/api-web/master/product/${id}`);
+        return data;
+    },
+    onMutate: () => {
+        showLoading();
+    },
+    onSuccess: (res) => {
+        productData.id = res.data.id;
+        productData.name = res.data.name;
+        productData.categoryId = res.data.category.id;
+        productData.price = res.data.price;
+        productData.stock = res.data.stock;
+        openModalProduct();
+    },
+    onError: (err) => {
+        swalApiResponse(err);
+    },
+    onSettled: () => {
+        hideLoading();
+    },
+});
+
+const submitProduct = () => {
+    if (productData.id) {
+        updateProductMutation.mutate();
+    } else {
+        storeProductMutation.mutate();
+    }
+};
+const editProduct = async (id: string) => {
+    showProductMutation.mutate(id);
+};
+const deleteProduct = async (id: string) => {
+    const confirmed = await swalConfirm({
+        title: "Delete Product",
+        text: "Product will be deleted permanently",
+        confirmText: "Yes, delete",
+    });
+    if (!confirmed) return;
+    deleteProductMutation.mutate(id);
+};
+
+const categoryList = ref<Category[]>([]);
+const { refetch: fetchCategory } = useQuery({
+    queryKey: ["product-category"],
+    queryFn: async () => {
+        const { data } = await customApi.get(
+            "/api-web/master/product/category",
+        );
+        return data;
+    },
+    onSuccess: (res) => {
+        categoryList.value = res.data.data;
+    },
+});
+const resetProduct = () => {
+    productData.id = "";
+    productData.name = "";
+    productData.categoryId = "";
+    productData.price = 0;
+    productData.stock = 0;
 };
 </script>

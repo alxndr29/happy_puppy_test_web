@@ -1,4 +1,3 @@
-
 import type { AxiosResponse, AxiosError } from "axios";
 
 type SwalOptions = {
@@ -54,7 +53,7 @@ export const swalConfirm = async (options?: {
 
 export const swalApiResponse = (
   responseOrError: unknown,
-  options?: SwalOptions
+  options?: SwalOptions,
 ) => {
   const {
     successTitle = "Success",
@@ -69,8 +68,7 @@ export const swalApiResponse = (
       icon: "success",
       title: successTitle,
       text: successMessage,
-      timer: 1500,
-      showConfirmButton: false,
+      showConfirmButton: true,
     });
   }
 
@@ -136,9 +134,7 @@ export const swalApiResponse = (
 
       // ✅ HANDLE VALIDATION ERRORS (ARRAY)
       if (Array.isArray(validationErrors) && validationErrors.length > 0) {
-        html = formatErrorMessage(
-          validationErrors.map((e: any) => e.message)
-        );
+        html = formatErrorMessage(validationErrors.map((e: any) => e.message));
       }
       // fallback lain
       else if (data.message) {
