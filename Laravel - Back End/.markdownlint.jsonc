@@ -1,0 +1,20 @@
+{
+    // Enable all rules by default
+    "default": true,
+    // MD013 - Line length (disabled for flexibility)
+    "MD013": false,
+    // MD029 - Ordered list item prefix (disabled - allow both styles)
+    "MD029": false,
+    // MD033 - Inline HTML (allow common elements)
+    "MD033": {
+        "allowed_elements": [
+            "br",
+            "details",
+            "summary",
+            "img",
+            "a"
+        ]
+    },
+    // MD041 - First line should be top-level heading (disabled for README flexibility)
+    "MD041": false
+}
