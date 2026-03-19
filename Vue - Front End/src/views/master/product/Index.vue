@@ -24,7 +24,9 @@
                         <li class="breadcrumb-item">
                             <span class="bullet bg-gray-400 w-5px h-2px"></span>
                         </li>
-                        <li class="breadcrumb-item text-muted">Master User</li>
+                        <li class="breadcrumb-item text-muted">
+                            Master Product
+                        </li>
                     </ul>
                 </div>
 
@@ -299,7 +301,7 @@
                             v-model="productData.price"
                             type="number"
                             class="form-control form-control-solid"
-                            placeholder="Enter Name"
+                            placeholder="Enter Price"
                         />
                     </div>
                     <div class="d-flex flex-column mb-8 fv-row">
@@ -310,7 +312,7 @@
                             v-model="productData.stock"
                             type="number"
                             class="form-control form-control-solid"
-                            placeholder="Enter Name"
+                            placeholder="Enter Stock"
                         />
                     </div>
                     <div class="d-flex flex-column mb-8 fv-row">
@@ -492,7 +494,7 @@ const deleteProductMutation = useMutation({
     },
     onSuccess: (res) => {
         swalApiResponse(res, {
-            successMessage: "Success Delete Customer",
+            successMessage: "Success Delete Product",
         });
         closeModalProduct?.();
         reloadKey.value++;
