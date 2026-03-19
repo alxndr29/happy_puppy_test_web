@@ -69,23 +69,26 @@
                             <div class="px-7 py-5">
                                 <div class="mb-10">
                                     <label class="form-label fw-semibold"
-                                        >Status:</label
+                                        >Category:</label
                                     >
                                     <div>
                                         <select
                                             class="form-select form-select-solid"
-                                            data-kt-select2="true"
                                             data-placeholder="Select option"
                                             data-dropdown-parent="#kt_menu_633f092552bb4"
                                             data-allow-clear="true"
+                                            v-model="filter_categoryId"
                                         >
-                                            <option></option>
-                                            <option value="1">Approved</option>
-                                            <option value="2">Pending</option>
-                                            <option value="2">
-                                                In Process
+                                            <option value="">
+                                                -- Select Category --
                                             </option>
-                                            <option value="2">Rejected</option>
+                                            <option
+                                                v-for="cat in categoryList"
+                                                :key="cat.id"
+                                                :value="cat.id"
+                                            >
+                                                {{ cat.name }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -145,6 +148,7 @@
                                         type="reset"
                                         class="btn btn-sm btn-light btn-active-light-primary me-2"
                                         data-kt-menu-dismiss="true"
+                                        @click="resetFilter"
                                     >
                                         Reset
                                     </button>
@@ -152,6 +156,7 @@
                                         type="submit"
                                         class="btn btn-sm btn-primary"
                                         data-kt-menu-dismiss="true"
+                                        @click="applyFilter"
                                     >
                                         Apply
                                     </button>
@@ -349,7 +354,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, onMounted } from "vue";
 import customApi from "@/utils/api.ts";
 import { useAuthStore } from "@/store/auth.ts";
 import DataTable from "@/components/Table.vue";
@@ -362,6 +367,7 @@ import { useMutation, useQuery } from "@tanstack/vue-query";
 
 const authStore = useAuthStore();
 const search = ref("");
+const filter_categoryId = ref("");
 const reloadKey = ref(0);
 
 const columns = [
@@ -374,8 +380,15 @@ const columns = [
 ];
 const filters = computed(() => ({
     search: search.value,
+    categoryId: filter_categoryId.value,
 }));
-
+const applyFilter = () => {
+    reloadKey.value++;
+};
+const resetFilter = () => {
+    filter_categoryId.value = "";
+    reloadKey.value++;
+};
 const fetchProducts = async (params: any) => {
     const { data } = await customApi.get("/api-web/master/product", {
         headers: {
@@ -536,19 +549,18 @@ const deleteProduct = async (id: string) => {
     deleteProductMutation.mutate(id);
 };
 
-const categoryList = ref<Category[]>([]);
-const { refetch: fetchCategory } = useQuery({
+const categoryList = computed(() => data.value?.data ?? []);
+const { data, isLoading, error } = useQuery({
     queryKey: ["product-category"],
     queryFn: async () => {
+        console.log("QUERY JALAN");
         const { data } = await customApi.get(
             "/api-web/master/product/category",
         );
         return data;
     },
-    onSuccess: (res) => {
-        categoryList.value = res.data.data;
-    },
 });
+
 const resetProduct = () => {
     productData.id = "";
     productData.name = "";
