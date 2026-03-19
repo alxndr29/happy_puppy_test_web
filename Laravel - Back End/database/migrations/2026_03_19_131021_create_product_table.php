@@ -20,8 +20,8 @@ return new class extends Migration {
                 ->constrained("category")
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
-            $table->integer("price")->unique();
-            $table->integer("stock")->unique();
+            $table->integer("price");
+            $table->integer("stock");
 
             $table->softDeletes();
             $table->timestamps();

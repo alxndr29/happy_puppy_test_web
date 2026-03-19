@@ -77,83 +77,11 @@
                         data-kt-menu="true"
                         data-kt-menu-expand="false"
                     >
-                        <div
-                            data-kt-menu-trigger="click"
-                            class="menu-item menu-accordion"
-                        >
-                            <span class="menu-link">
-                                <span class="menu-icon">
-                                    <span class="svg-icon svg-icon-2">
-                                        <svg
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <rect
-                                                x="2"
-                                                y="2"
-                                                width="9"
-                                                height="9"
-                                                rx="2"
-                                                fill="currentColor"
-                                            ></rect>
-                                            <rect
-                                                opacity="0.3"
-                                                x="13"
-                                                y="2"
-                                                width="9"
-                                                height="9"
-                                                rx="2"
-                                                fill="currentColor"
-                                            ></rect>
-                                            <rect
-                                                opacity="0.3"
-                                                x="13"
-                                                y="13"
-                                                width="9"
-                                                height="9"
-                                                rx="2"
-                                                fill="currentColor"
-                                            ></rect>
-                                            <rect
-                                                opacity="0.3"
-                                                x="2"
-                                                y="13"
-                                                width="9"
-                                                height="9"
-                                                rx="2"
-                                                fill="currentColor"
-                                            ></rect>
-                                        </svg>
-                                    </span>
-                                </span>
-                                <span class="menu-title">Dashboards</span>
-                                <span class="menu-arrow"></span>
-                            </span>
-                            <div class="menu-sub menu-sub-accordion">
-                                <div class="menu-item">
-                                    <router-link
-                                        to="/dashboard"
-                                        class="menu-link"
-                                        active-class="active"
-                                    >
-                                        <span class="menu-bullet">
-                                            <span
-                                                class="bullet bullet-dot"
-                                            ></span>
-                                        </span>
-                                        <span class="menu-title">Default</span>
-                                    </router-link>
-                                </div>
-                            </div>
-                        </div>
                         <div class="menu-item pt-5">
                             <div class="menu-content">
                                 <span
                                     class="menu-heading fw-bold text-uppercase fs-7"
-                                    >Layouts</span
+                                    >Master</span
                                 >
                             </div>
                         </div>
@@ -183,43 +111,11 @@
                                         </svg>
                                     </span>
                                 </span>
-                                <span class="menu-title">MENU</span>
+                                <span class="menu-title">Data</span>
                                 <span class="menu-arrow"></span>
                             </span>
 
                             <div class="menu-sub menu-sub-accordion">
-                                <div class="menu-item">
-                                    <router-link
-                                        to="/master/user"
-                                        class="menu-link"
-                                        active-class="active"
-                                    >
-                                        <span class="menu-bullet">
-                                            <span
-                                                class="bullet bullet-dot"
-                                            ></span>
-                                        </span>
-                                        <span class="menu-title"
-                                            >Master User</span
-                                        >
-                                    </router-link>
-                                </div>
-                                <div class="menu-item">
-                                    <router-link
-                                        to="/master/customer"
-                                        class="menu-link"
-                                        active-class="active"
-                                    >
-                                        <span class="menu-bullet">
-                                            <span
-                                                class="bullet bullet-dot"
-                                            ></span>
-                                        </span>
-                                        <span class="menu-title"
-                                            >Master Customer</span
-                                        >
-                                    </router-link>
-                                </div>
                                 <div class="menu-item">
                                     <router-link
                                         to="/master/product"
@@ -231,9 +127,7 @@
                                                 class="bullet bullet-dot"
                                             ></span>
                                         </span>
-                                        <span class="menu-title"
-                                            >Master Product</span
-                                        >
+                                        <span class="menu-title">Product</span>
                                     </router-link>
                                 </div>
                             </div>

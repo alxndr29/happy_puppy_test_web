@@ -30,9 +30,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::group(['prefix' => 'product'], function () {
             Route::get('/', [ApiWeb\MasterProductController::class, 'index'])->middleware(['role:admin']);
             Route::post('/', [ApiWeb\MasterProductController::class, 'store'])->middleware(['role:admin']);
+            Route::get('/category', [ApiWeb\MasterProductController::class, 'getCategory'])->middleware(['role:admin']);
             Route::get('/{id}', [ApiWeb\MasterProductController::class, 'show'])->middleware(['role:admin'])->whereUuid('id');
             Route::post('/{id}/update', [ApiWeb\MasterProductController::class, 'update'])->middleware(['role:admin'])->whereUuid('id');
             Route::delete('/{id}', [ApiWeb\MasterProductController::class, 'delete'])->middleware(['role:admin'])->whereUuid('id');
+           
         });
     });
 });

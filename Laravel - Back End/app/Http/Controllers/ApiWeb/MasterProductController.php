@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ApiWeb;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
 use App\Interfaces\CategoryInterface;
@@ -43,7 +44,7 @@ class MasterProductController extends Controller
      *     @OA\Schema(type="string")
      *   ),
      *   @OA\Parameter(
-     *     name="orderBy",
+     *     name="sortOrder",
      *     in="query",
      *     @OA\Schema(type="string", enum={"asc","desc"})
      *   ),
@@ -71,7 +72,7 @@ class MasterProductController extends Controller
             search: $request->search,
             sortOption: [
                 "orderCol" => $request->sort_by,
-                "orderDir" => $request->order_by,
+                "orderDir" => $request->sort_order,
             ],
             paginateOption: [
                 "method" => "paginate",
@@ -249,5 +250,22 @@ class MasterProductController extends Controller
     {
         $user = $this->productRepository->delete($id);
         return ResponseFormatter::success(null, "Berhasil Hapus");
+    }
+
+    /**
+     * @OA\Get(
+     *     tags={"ApiWeb|Master|Product"},
+     *     path="/api-web/master/product/category",
+     *     summary="Product Category",
+     *     @OA\Response(response="default", ref="#/components/responses/globalResponse")
+     * )
+     */
+    public function getCategory()
+    {
+        $data = $this->categoryRepository->getAll();
+        return ResponseFormatter::success(
+            CategoryResource::collection($data),
+            "Data berhasil diambil",
+        );
     }
 }

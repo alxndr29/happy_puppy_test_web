@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/auth";
 const api = import.meta.env.VITE_API_URL;
 
 const customApi = axios.create({
-  baseURL: `${api}/api`,
+  baseURL: `${api}`,
 });
 
 customApi.interceptors.request.use((config) => {

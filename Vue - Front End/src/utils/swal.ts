@@ -1,3 +1,4 @@
+
 import type { AxiosResponse, AxiosError } from "axios";
 
 type SwalOptions = {
@@ -11,7 +12,9 @@ const formatErrorMessage = (message: any): string => {
   if (Array.isArray(message)) {
     return `
       <ul style="text-align:left;padding-left:18px;margin:0;">
-        ${message.map((m) => `<li style="margin-bottom:4px;">${m}</li>`).join("")}
+        ${message
+          .map((m) => `<li style="margin-bottom:4px;">${m}</li>`)
+          .join("")}
       </ul>
     `;
   }
@@ -22,6 +25,7 @@ const formatErrorMessage = (message: any): string => {
 
   return "Terjadi kesalahan";
 };
+
 export const swalConfirm = async (options?: {
   title?: string;
   text?: string;
@@ -47,9 +51,10 @@ export const swalConfirm = async (options?: {
 
   return result.isConfirmed;
 };
+
 export const swalApiResponse = (
   responseOrError: unknown,
-  options?: SwalOptions,
+  options?: SwalOptions
 ) => {
   const {
     successTitle = "Success",
@@ -58,16 +63,18 @@ export const swalApiResponse = (
     errorMessage = "Terjadi kesalahan",
   } = options || {};
 
+  // ================= SUCCESS CUSTOM =================
   if (successMessage) {
     return Swal.fire({
       icon: "success",
       title: successTitle,
       text: successMessage,
       timer: 1500,
-      showConfirmButton: true,
+      showConfirmButton: false,
     });
   }
 
+  // ================= SUCCESS FROM RESPONSE =================
   if (
     typeof responseOrError === "object" &&
     responseOrError !== null &&
@@ -88,6 +95,7 @@ export const swalApiResponse = (
     }
   }
 
+  // ================= ERROR HANDLING =================
   let title = errorTitle;
   let html = errorMessage;
 
@@ -96,27 +104,47 @@ export const swalApiResponse = (
     const data = err.response?.data;
 
     if (data) {
-      html = formatErrorMessage(data.message);
+      const metaMessage = data.meta?.message;
+      const validationErrors = data.data?.errors;
 
-      switch (err.response?.status) {
-        case 400:
-          title = "Bad Request";
-          break;
-        case 401:
-          title = "Unauthorized";
-          break;
-        case 403:
-          title = "Forbidden";
-          break;
-        case 404:
-          title = "Not Found";
-          break;
-        case 422:
-          title = "Validation Error";
-          break;
-        case 500:
-          title = "Server Error";
-          break;
+      // ✅ TITLE PRIORITAS DARI META.MESSAGE
+      if (metaMessage) {
+        title = metaMessage;
+      } else {
+        // fallback kalau meta.message tidak ada
+        switch (err.response?.status) {
+          case 400:
+            title = "Bad Request";
+            break;
+          case 401:
+            title = "Unauthorized";
+            break;
+          case 403:
+            title = "Forbidden";
+            break;
+          case 404:
+            title = "Not Found";
+            break;
+          case 422:
+            title = "Validation Error";
+            break;
+          case 500:
+            title = "Server Error";
+            break;
+        }
+      }
+
+      // ✅ HANDLE VALIDATION ERRORS (ARRAY)
+      if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+        html = formatErrorMessage(
+          validationErrors.map((e: any) => e.message)
+        );
+      }
+      // fallback lain
+      else if (data.message) {
+        html = data.message;
+      } else {
+        html = errorMessage;
       }
     }
   }

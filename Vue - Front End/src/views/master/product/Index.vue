@@ -89,7 +89,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="mb-10">
+                                <!-- <div class="mb-10">
                                     <label class="form-label fw-semibold"
                                         >Member Type:</label
                                     >
@@ -139,7 +139,7 @@
                                             >Enabled</label
                                         >
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="d-flex justify-content-end">
                                     <button
                                         type="reset"
@@ -160,10 +160,8 @@
                         </div>
                     </div>
                     <a
-                        href="#"
+                        @click="openModalProduct"
                         class="btn btn-sm fw-bold btn-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#kt_modal_create_app"
                         >Create</a
                     >
                 </div>
@@ -229,6 +227,9 @@
                             >
                                 <template #row="{ row }">
                                     <td>{{ row.name }}</td>
+                                    <td>{{ row?.category?.name }}</td>
+                                    <td>{{ row.price }}</td>
+                                    <td>{{ row.stock }}</td>
                                 </template>
                             </DataTable>
                         </div>
@@ -237,35 +238,136 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modal_product" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content rounded">
+                <!-- Header -->
+                <div class="modal-header pb-0 border-0 justify-content-end">
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-icon btn-active-color-primary"
+                        @click="closeModalCustomer"
+                    >
+                        ✕
+                    </button>
+                </div>
+                <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
+                    <div class="mb-13 text-center">
+                        <h1 class="mb-3">
+                            <!-- {{
+                                customerData.id
+                                    ? "Edit Customer"
+                                    : "Add Customer"
+                            }} -->
+                        </h1>
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="fs-6 fw-semibold mb-2">
+                            <span class="required">Name</span>
+                        </label>
+                        <input
+                            type="text"
+                            class="form-control form-control-solid"
+                            placeholder="Enter Name"
+                        />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="fs-6 fw-semibold mb-2">
+                            <span class="required">Price</span>
+                        </label>
+                        <input
+                            type="number"
+                            class="form-control form-control-solid"
+                            placeholder="Enter Name"
+                        />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="fs-6 fw-semibold mb-2">
+                            <span class="required">Stock</span>
+                        </label>
+                        <input
+                            type="number"
+                            class="form-control form-control-solid"
+                            placeholder="Enter Name"
+                        />
+                    </div>
+                    <div class="d-flex flex-column mb-8 fv-row">
+                        <label class="fs-6 fw-semibold mb-2">
+                            <span class="required">Category</span>
+                        </label>
+                        <select class="form-select form-select-solid">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                    </div>
+                    <div class="text-center">
+                        <button
+                            type="button"
+                            class="btn btn-light me-3"
+                            @click="closeModalProduct"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="submitCustomer"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import customApi from "@/utils/api.ts";
 import { useAuthStore } from "@/store/auth.ts";
 import DataTable from "@/components/Table.vue";
+import { showModal, hideModal } from "@/helpers/modal";
+import { swalApiResponse, swalConfirm } from "@/utils/swal";
+import { showLoading, hideLoading } from "@/utils/loading";
+import { Product } from "@/interfaces/product";
 
 const authStore = useAuthStore();
 
 const search = ref("");
 const columns = [
     { key: "name", label: "Name", sortable: true, width: "200px" },
+    { key: "category_id", label: "Category", sortable: true, width: "200px" },
+    { key: "price", label: "Price", sortable: true, width: "200px" },
+    { key: "stock", label: "Stock", sortable: true, width: "200px" },
 ];
 const filters = computed(() => ({
     search: search.value,
 }));
 
 const fetchProducts = async (params: any) => {
-    const { data } = await customApi.get("/product", {
+    const { data } = await customApi.get("/api-web/master/product", {
         headers: {
             Authorization: `Bearer ${authStore.token}`,
         },
         params,
     });
-    return data;
+    return data.data;
 };
 
-const testFunction = (row: any) => {
-    alert(JSON.stringify(row, null, 2));
+const productData = reactive<Product>({
+    id: "",
+    name: "",
+    categoryId: "",
+    price: 0,
+    stock: 0,
+});
+
+const openModalProduct = () => {
+    showModal("modal_product");
+};
+
+const closeModalProduct = () => {
+    hideModal("modal_product");
 };
 </script>
