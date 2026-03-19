@@ -208,7 +208,7 @@ const logOutMutation = useMutation({
         authStore.removeAuth();
     },
     onSuccess: () => {
-        router.push({ name: "dashboard" });
+        router.push({ name: "login" });
     },
     onError: (error) => {
         swalApiResponse(error);
